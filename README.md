@@ -58,6 +58,22 @@ Every credential lives in the gateway: the browser sends an opaque client id
 
 ---
 
+## Local mode (no server)
+
+When `VITE_GATEWAY_URL` is empty the app runs without any backend of its own:
+
+- Provider API keys are stored **encrypted on the user's device only**: AES-256-GCM, with a
+  random non-extractable key kept in IndexedDB; only ciphertext is written to `localStorage`.
+- The browser calls the provider directly (`src/lib/local/`), so a provider must allow
+  browser requests (CORS). OpenRouter, OpenAI, Google, Groq, Mistral, DeepSeek and most
+  OpenAI-compatible APIs do; Anthropic is supported through its browser-access header.
+  Providers that block browsers (for example Bedrock) report a clear error instead of failing silently.
+- Keys do not sync between devices, and service integrations (OAuth) stay disabled because
+  their secrets cannot live in a browser. Set `VITE_GATEWAY_URL` to use the server gateway instead.
+
+Limit: encryption at rest protects against storage dumps and casual inspection, but code running
+inside the page can still use the vault, so do not add third-party scripts.
+
 ## Run it
 
 ```bash

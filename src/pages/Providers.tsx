@@ -7,6 +7,7 @@ import { PROVIDERS, PROVIDER_MAP, type ProviderId } from '../ai/types';
 import { Badge, Button, Icon, Input } from '../components/ui';
 import { VendorLogo } from '../components/Logo';
 import { cn, truncate } from '../lib/utils';
+import { localMode } from '../lib/gateway';
 
 /* ------------------------------- list page ------------------------------- */
 
@@ -341,8 +342,12 @@ export function ProviderDetailPage() {
             <h2 className="text-[1rem] font-bold text-[var(--text)]">{t('providers.addKey')}</h2>
             <p className="mt-1 text-[0.85rem] leading-relaxed text-[var(--text-2)]">
               {lang === 'ar'
-                ? `أدخل مفتاح الـ API الخاص بـ ${provider.name}. يُخزَّن على الخادم مشفَّراً ولا يظهر بعد الحفظ.`
-                : `Enter your ${provider.name} API key. It is stored encrypted on the server and never shown again.`}
+                ? localMode
+                  ? `أدخل مفتاح الـ API الخاص بـ ${provider.name}. يُحفظ مشفَّراً على جهازك فقط ولا يُرسل إلى أي خادم ولا يظهر بعد الحفظ.`
+                  : `أدخل مفتاح الـ API الخاص بـ ${provider.name}. يُخزَّن على الخادم مشفَّراً ولا يظهر بعد الحفظ.`
+                : localMode
+                  ? `Enter your ${provider.name} API key. It is stored encrypted on this device only, never sent to any server, and never shown again.`
+                  : `Enter your ${provider.name} API key. It is stored encrypted on the server and never shown again.`}
             </p>
 
             <div className="mt-4 flex flex-wrap items-end gap-2">

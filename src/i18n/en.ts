@@ -166,7 +166,7 @@ export const en = {
 
   // ---- providers ----
   'providers.title': 'AI Providers',
-  'providers.sub': 'Connect the providers you have access to. Keys are stored server-side and never shown again.',
+  'providers.sub': 'Connect the providers you have access to. Keys are stored encrypted and never shown again.',
   'providers.modelsCount': 'models',
   'providers.filterAll': 'All',
   'providers.filterConnected': 'Connected',

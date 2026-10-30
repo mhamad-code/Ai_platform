@@ -165,7 +165,7 @@ export const ar: Dict = {
 
   // ---- providers ----
   'providers.title': 'مزودو الذكاء الاصطناعي',
-  'providers.sub': 'اربط المزودين المتاحين لديك. تُحفظ المفاتيح في الخادم ولا تُعرض مرة أخرى.',
+  'providers.sub': 'اربط المزودين المتاحين لديك. تُحفظ المفاتيح مشفّرة ولا تُعرض مرة أخرى.',
   'providers.modelsCount': 'نموذج',
   'providers.filterAll': 'الكل',
   'providers.filterConnected': 'متصل',

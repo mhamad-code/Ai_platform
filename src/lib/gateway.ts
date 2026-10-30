@@ -1,13 +1,24 @@
 /**
  * Gateway client — the ONLY network surface the UI uses for AI providers,
  * web search and integration connections. Vendor endpoints are never called
- * from components; API keys never reach the browser.
+ * from components.
+ *
+ * Two modes, chosen at build time:
+ *  - VITE_GATEWAY_URL set   → a server gateway holds the keys (server-side).
+ *  - VITE_GATEWAY_URL empty → local mode: keys are stored encrypted on this
+ *    device only and the browser calls the provider directly (see ./local).
  */
+import { GatewayError } from './gatewayError';
+import { localGateway, localStreamChat } from './local';
 
-const RAW_BASE = (import.meta.env.VITE_GATEWAY_URL as string | undefined) ?? '';
-/** In dev with no explicit URL we proxy /gw -> localhost:8787 (see vite.config.ts). */
-export const GATEWAY_BASE = RAW_BASE || (import.meta.env.DEV ? '/gw' : '');
-export const gatewayEnabled = Boolean(GATEWAY_BASE);
+export { GatewayError };
+
+const RAW_BASE = ((import.meta.env.VITE_GATEWAY_URL as string | undefined) ?? '').trim().replace(/\/$/, '');
+export const GATEWAY_BASE = RAW_BASE;
+/** True when no server gateway is configured and everything runs on this device. */
+export const localMode = !RAW_BASE;
+/** True when a backend (remote gateway or the local engine) can serve AI calls. */
+export const gatewayEnabled = true;
 
 /**
  * Identity sent to the gateway. Two layers:
@@ -51,20 +62,10 @@ async function identityHeaders(): Promise<Record<string, string>> {
   return headers;
 }
 
-export class GatewayError extends Error {
-  status: number;
-  kind: 'auth' | 'quota' | 'network' | 'server' | 'notConfigured' | 'unknown';
-  constructor(kind: GatewayError['kind'], message: string, status = 0) {
-    super(message);
-    this.kind = kind;
-    this.status = status;
-  }
-}
-
 let healthCache: { at: number; ok: boolean } | null = null;
 
 export async function gatewayHealth(timeoutMs = 3500): Promise<boolean> {
-  if (!gatewayEnabled) return false;
+  if (localMode) return true;
   if (healthCache && Date.now() - healthCache.at < 15000) return healthCache.ok;
   try {
     const ctrl = new AbortController();
@@ -84,7 +85,6 @@ export function resetHealthCache() {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  if (!gatewayEnabled) throw new GatewayError('notConfigured', 'gateway disabled');
   let res: Response;
   try {
     res = await fetch(`${GATEWAY_BASE}${path}`, {
@@ -133,7 +133,7 @@ export interface GatewayModel {
   [k: string]: unknown;
 }
 
-export const gateway = {
+const remoteGateway = {
   providers: {
     status: () => request<{ connections: Record<string, { connected: boolean; hint?: string; models?: number; lastTest?: { ok: boolean; at: number; message?: string } }> }>('/providers'),
     saveKey: (provider: string, apiKey: string) =>
@@ -196,6 +196,9 @@ export const gateway = {
   },
 };
 
+/** The active implementation: local engine, or the server gateway when one is configured. */
+export const gateway: typeof remoteGateway = localMode ? localGateway : remoteGateway;
+
 /**
  * Reads an SSE stream produced by POST /chat.
  * Events: {type:'text'|'source'|'reasoning'|'done'|'error', ...}
@@ -205,7 +208,7 @@ export async function streamChat(
   onEvent: (ev: import('../ai/types').StreamDelta) => void,
   signal?: AbortSignal,
 ): Promise<void> {
-  if (!gatewayEnabled) throw new GatewayError('notConfigured', 'gateway disabled');
+  if (localMode) return localStreamChat(payload, onEvent, signal);
   let res: Response;
   try {
     res = await fetch(`${GATEWAY_BASE}/chat`, {
