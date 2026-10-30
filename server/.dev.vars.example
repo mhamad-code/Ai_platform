@@ -1,0 +1,56 @@
+# ---------------------------------------------------------------------------
+# Gateway environment  (copy to server/.dev.vars for local development,
+# or set as Worker secrets/vars for `wrangler deploy`).
+#
+# NEVER commit real values. The gateway is the only place provider keys,
+# OAuth client secrets and search keys exist.
+# ---------------------------------------------------------------------------
+
+# Required: derives the AES-GCM key that encrypts every stored credential.
+# Generate with: openssl rand -hex 32
+GATEWAY_SECRET=
+
+# Where the browser app lives (used for the OAuth return redirect).
+APP_ORIGIN=http://localhost:3000
+ALLOWED_ORIGIN=http://localhost:3000
+
+# --- Identity (optional but recommended) ------------------------------------
+# When set, the gateway verifies the Firebase ID token on every request and
+# scopes credentials to the verified `sub`. Without it, credentials are scoped
+# to the opaque X-Client-Id of the browser (weaker isolation).
+FIREBASE_PROJECT_ID=
+
+# --- Web search (optional) --------------------------------------------------
+# Without a key the gateway uses Wikipedia, Wikimedia Commons and the
+# DuckDuckGo Instant Answer API — all keyless and legal for this use.
+# With a key, a full web index is used instead.
+SERPER_API_KEY=
+BRAVE_API_KEY=
+
+# --- OAuth (per service you actually wire up) --------------------------------
+# Only the services you configure here can be connected with "sign in with
+# <vendor>"; everything else falls back to its official token flow or shows
+# explicit setup steps instead of pretending to work.
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+GITLAB_CLIENT_ID=
+GITLAB_CLIENT_SECRET=
+BITBUCKET_CLIENT_ID=
+BITBUCKET_CLIENT_SECRET=
+SLACK_CLIENT_ID=
+SLACK_CLIENT_SECRET=
+NOTION_CLIENT_ID=
+NOTION_CLIENT_SECRET=
+FIGMA_CLIENT_ID=
+FIGMA_CLIENT_SECRET=
+LINEAR_CLIENT_ID=
+VERCEL_CLIENT_ID=
+VERCEL_CLIENT_SECRET=
+NETLIFY_CLIENT_ID=
+NETLIFY_CLIENT_SECRET=
+SENTRY_CLIENT_ID=
+SENTRY_CLIENT_SECRET=
+GOOGLE_OAUTH_CLIENT_ID=
+GOOGLE_OAUTH_CLIENT_SECRET=
+ATLASSIAN_CLIENT_ID=
+ATLASSIAN_CLIENT_SECRET=

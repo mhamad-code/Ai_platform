@@ -1,0 +1,16 @@
+# dependencies / build output
+node_modules/
+dist/
+.wrangler/
+.vite/
+
+# local secrets — never commit these
+.env
+.env.local
+.env.*.local
+server/.dev.vars
+
+# logs & OS files
+*.log
+npm-debug.log*
+.DS_Store

@@ -1,0 +1,360 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================================
+   Theme tokens
+   Dark and light are designed separately (not inverted copies of each other).
+   ========================================================================= */
+:root {
+  color-scheme: light;
+  --bg: #eef1f5;
+  --bg-2: #e3e8ef;
+  --panel: rgba(255, 255, 255, 0.72);
+  --panel-solid: #ffffff;
+  --panel-2: rgba(247, 249, 252, 0.86);
+  --border: rgba(15, 23, 42, 0.1);
+  --border-strong: rgba(15, 23, 42, 0.18);
+  --text: #10151d;
+  --text-2: #46505f;
+  --text-3: #6f7a8a;
+  --accent: #3563e6;
+  --accent-soft: rgba(53, 99, 230, 0.12);
+  --accent-text: #2a4fc0;
+  --bubble-user: rgba(53, 99, 230, 0.14);
+  --shadow: 0 10px 34px rgba(15, 23, 42, 0.12);
+  --danger: #d14343;
+  --ok: #1f9d63;
+  --blur: 18px;
+  --sat: 1.05;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: #0b0e13;
+  --bg-2: #0f131a;
+  --panel: rgba(17, 21, 28, 0.62);
+  --panel-solid: #12161d;
+  --panel-2: rgba(22, 27, 34, 0.78);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text: #edf1f7;
+  --text-2: #aeb8c7;
+  --text-3: #7e8998;
+  --accent: #4c7dff;
+  --accent-soft: rgba(76, 125, 255, 0.16);
+  --accent-text: #93b0ff;
+  --bubble-user: rgba(76, 125, 255, 0.14);
+  --shadow: 0 14px 44px rgba(0, 0, 0, 0.5);
+  --danger: #ff6b6b;
+  --ok: #3ddc97;
+  --blur: 20px;
+  --sat: 1;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cairo', 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+/* Compact / comfortable density */
+.density-compact .app-main {
+  --row-gap: 0.5rem;
+}
+.density-compact .card {
+  padding: 0.75rem;
+}
+
+/* =========================================================================
+   Glass surfaces
+   ========================================================================= */
+.glass {
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
+  backdrop-filter: blur(var(--blur)) saturate(var(--sat));
+  border: 1px solid var(--border);
+}
+
+.glass-strong {
+  background: var(--panel-2);
+  -webkit-backdrop-filter: blur(calc(var(--blur) * 1.6)) saturate(var(--sat));
+  backdrop-filter: blur(calc(var(--blur) * 1.6)) saturate(var(--sat));
+  border: 1px solid var(--border);
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
+  backdrop-filter: blur(var(--blur)) saturate(var(--sat));
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+.card:hover {
+  border-color: var(--border-strong);
+}
+
+.hairline {
+  border-color: var(--border);
+}
+
+.text-2 {
+  color: var(--text-2);
+}
+.text-3 {
+  color: var(--text-3);
+}
+.bg-panel {
+  background: var(--panel);
+}
+.bg-panel-solid {
+  background: var(--panel-solid);
+}
+.accent {
+  color: var(--accent-text);
+}
+.bg-accent {
+  background: var(--accent);
+}
+.border-hair {
+  border-color: var(--border);
+}
+
+/* Nice scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* =========================================================================
+   Markdown output
+   ========================================================================= */
+.md {
+  font-size: 0.975rem;
+  line-height: 1.85;
+  color: var(--text);
+  word-break: break-word;
+}
+.md > * + * {
+  margin-top: 0.9rem;
+}
+.md h1,
+.md h2,
+.md h3,
+.md h4 {
+  font-weight: 700;
+  line-height: 1.4;
+  margin-top: 1.5rem;
+}
+.md h1 {
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+.md h2 {
+  font-size: 1.28rem;
+}
+.md h3 {
+  font-size: 1.1rem;
+}
+.md h4 {
+  font-size: 1rem;
+  color: var(--text-2);
+}
+.md strong {
+  font-weight: 700;
+}
+.md a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.md a:hover {
+  text-decoration-color: var(--accent);
+}
+.md ul,
+.md ol {
+  padding-inline-start: 1.35rem;
+  display: grid;
+  gap: 0.35rem;
+}
+.md ul {
+  list-style: disc;
+}
+.md ol {
+  list-style: decimal;
+}
+.md li::marker {
+  color: var(--text-3);
+}
+.md li > ul,
+.md li > ol {
+  margin-top: 0.35rem;
+}
+.md blockquote {
+  border-inline-start: 3px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.6rem;
+  color: var(--text-2);
+}
+.md hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1.4rem 0;
+}
+.md table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  overflow: hidden;
+  display: table;
+}
+.md th,
+.md td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.55rem 0.75rem;
+  text-align: start;
+  vertical-align: top;
+}
+.md thead th {
+  background: var(--panel-2);
+  font-weight: 600;
+  color: var(--text-2);
+}
+.md tbody tr:last-child td {
+  border-bottom: 0;
+}
+.md tbody tr:hover td {
+  background: var(--accent-soft);
+}
+.md img {
+  max-width: 100%;
+  border-radius: 0.7rem;
+  border: 1px solid var(--border);
+}
+.md code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.85em;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  padding: 0.08em 0.38em;
+  border-radius: 0.35rem;
+}
+.md details {
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--panel-2);
+}
+.md details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.md .katex {
+  font-size: 1.05em;
+}
+
+/* Tables produced as interactive sortable components */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.table-wrap th,
+.table-wrap td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  text-align: start;
+}
+.table-wrap thead th {
+  background: var(--panel-2);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.table-wrap tbody tr:hover {
+  background: var(--accent-soft);
+}
+
+/* Focus ring */
+.focusable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--border);
+  border-radius: 0.5rem;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+/* Reduced motion support */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Highlight.js theme bridge */
+.hljs {
+  background: transparent !important;
+  color: var(--text) !important;
+}
