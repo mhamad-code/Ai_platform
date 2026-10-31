@@ -190,6 +190,12 @@ export const vault = {
     writeMap(LS_TESTS, tests);
   },
 
+  clearTest(provider: string) {
+    const tests = readMap<StoredTest>(LS_TESTS);
+    delete tests[provider];
+    writeMap(LS_TESTS, tests);
+  },
+
   tests(): Record<string, StoredTest> {
     return readMap<StoredTest>(LS_TESTS);
   },

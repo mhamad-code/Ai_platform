@@ -44,6 +44,11 @@ function toGatewayError(provider: string, e: unknown): GatewayError {
   return new GatewayError('unknown', msg);
 }
 
+/** API keys are plain ASCII. Drop invisible/RTL marks, NBSP, newlines etc. that clipboards and RTL keyboards add. */
+function sanitizeKey(raw: string): string {
+  return raw.replace(/[^\x21-\x7E]/g, '');
+}
+
 function requireProvider(provider: string) {
   if (!PROVIDER_DEFS[provider]) throw new GatewayError('unknown', `unknown provider "${provider}"`, 400);
 }
@@ -57,7 +62,7 @@ async function requireKey(provider: string): Promise<string> {
       401,
     );
   }
-  return key;
+  return sanitizeKey(key);
 }
 
 function needsServer(): GatewayError {
@@ -107,7 +112,9 @@ async function verifyKey(provider: string, key: string): Promise<string | null> 
     } catch {
       /* keep status */
     }
-    return res.status === 401 || res.status === 403 ? `Authentication failed: ${message}` : null;
+    return res.status === 401 || res.status === 403
+      ? `Authentication failed: ${message} (saved key: ${key.length} chars, ends …${key.slice(-4)})`
+      : null;
   } catch {
     return null; // network/CORS problem on this probe only — fall back to the normal test
   }
@@ -135,9 +142,12 @@ export const localGateway = {
 
     saveKey: async (provider: string, apiKey: string) => {
       requireProvider(provider);
-      if (!apiKey.trim()) throw new GatewayError('unknown', 'apiKey is required', 400);
+      const clean = sanitizeKey(apiKey);
+      if (!clean) throw new GatewayError('unknown', 'apiKey is required', 400);
       try {
-        return { ok: true, hint: await vault.save(provider, apiKey) };
+        const hint = await vault.save(provider, clean);
+        vault.clearTest(provider); // a new key invalidates the previous test result
+        return { ok: true, hint };
       } catch (e) {
         throw new GatewayError('unknown', (e as Error).message);
       }
