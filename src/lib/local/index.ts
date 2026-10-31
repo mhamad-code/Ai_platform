@@ -87,6 +87,32 @@ async function modelsFor(provider?: string): Promise<{ models: GatewayModel[]; e
   return { models, errors };
 }
 
+/**
+ * Some providers list models without authentication (OpenRouter does), so a
+ * successful model list proves nothing about the key. Where the vendor offers a
+ * cheap authenticated endpoint, ask it. Returns an error message, or null when
+ * the key is accepted (or the check could not be run).
+ */
+async function verifyKey(provider: string, key: string): Promise<string | null> {
+  if (provider !== 'openrouter') return null;
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/auth/key', {
+      headers: { Authorization: `Bearer ${key.trim()}`, Accept: 'application/json' },
+    });
+    if (res.ok) return null;
+    let message = `HTTP ${res.status}`;
+    try {
+      const body = (await res.json()) as { error?: { message?: string } | string };
+      message = typeof body.error === 'string' ? body.error : (body.error?.message ?? message);
+    } catch {
+      /* keep status */
+    }
+    return res.status === 401 || res.status === 403 ? `Authentication failed: ${message}` : null;
+  } catch {
+    return null; // network/CORS problem on this probe only — fall back to the normal test
+  }
+}
+
 export const localGateway = {
   providers: {
     status: async () => {
@@ -122,8 +148,13 @@ export const localGateway = {
       let result = { ok: false, message: 'no credential', models: 0 };
       try {
         const key = await requireKey(provider);
-        result = await testProvider(provider, key);
-        if (!result.ok && NETWORK_RE.test(result.message)) result = { ...result, message: corsMessage(provider) };
+        const rejected = await verifyKey(provider, key);
+        if (rejected) {
+          result = { ok: false, message: rejected, models: 0 };
+        } else {
+          result = await testProvider(provider, key);
+          if (!result.ok && NETWORK_RE.test(result.message)) result = { ...result, message: corsMessage(provider) };
+        }
       } catch (e) {
         result = { ok: false, message: toGatewayError(provider, e).message, models: 0 };
       }

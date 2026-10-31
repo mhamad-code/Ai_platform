@@ -382,6 +382,7 @@ async function runStream({ chatId, history, modelId, provider, temporary }: Stre
   } catch (e) {
     const key = errorKey(e);
     assistant.error = key;
+    if (e instanceof Error && e.message) assistant.errorDetail = e.message.slice(0, 300);
     useChat.setState({ streaming: false, stream: null, error: key });
     if (!temporary) await msgWs.save(chatId, assistant).catch(() => undefined);
     useUI.getState().toast(

@@ -387,6 +387,8 @@ export interface ChatMessage {
   provider?: ProviderId;
   sources?: SourceItem[];
   error?: string;
+  /** Provider/gateway message behind `error`, shown so failures are diagnosable. */
+  errorDetail?: string;
   rating?: 1 | -1;
   attachments?: AttachmentMeta[];
   /**

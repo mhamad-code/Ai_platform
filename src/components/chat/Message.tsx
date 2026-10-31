@@ -156,7 +156,13 @@ export default function Message({ msg, streaming, onFollowUp }: Props) {
               <div className="flex items-center gap-2 text-[0.86rem] font-bold text-[var(--danger)]">
                 <Icon name="warn" className="h-4 w-4" /> {t(msg.error as never)}
               </div>
-              <p className="mt-1 text-[0.8rem] text-[var(--text-2)]">{t('chat.notConfiguredBody')}</p>
+              {msg.errorDetail ? (
+                <p dir="auto" className="mt-1 break-words text-[0.8rem] text-[var(--text-2)]">
+                  {msg.errorDetail}
+                </p>
+              ) : (
+                <p className="mt-1 text-[0.8rem] text-[var(--text-2)]">{t('chat.notConfiguredBody')}</p>
+              )}
               <button
                 onClick={() => void retry()}
                 className="focusable mt-2 rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-[0.8rem] font-semibold hover:bg-[var(--border)]"
